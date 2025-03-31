@@ -31,13 +31,28 @@ def decrypt_data(encrypted_data: bytes) -> bytes:
     decrypted_data = decrypted_data[:-padding]
     return decrypted_data
 
-# ✅ ฟังก์ชันเข้ารหัสไฟล์ (เปลี่ยนนามสกุลเป็น .bin)
+# ✅ ฟังก์ชันเข้ารหัสไฟล์ (ให้เลือก .enc หรือ .bin)
 def encrypt_mode():
     input_file = input("🔹 กรุณาใส่ชื่อไฟล์ที่ต้องการเข้ารหัส: ").strip()
     if not os.path.exists(input_file):
         print("❌ ไม่พบไฟล์ที่ต้องการเข้ารหัส")
         return
-    output_file = input_file + ".bin"  # เปลี่ยนเป็น .bin
+    
+    # เพิ่มตัวเลือกนามสกุล
+    print("🔸 เลือกนามสกุลไฟล์ที่เข้ารหัส:")
+    print("1. .enc")
+    print("2. .bin")
+    ext_choice = input("🔹 กรุณาเลือก (1 หรือ 2): ").strip()
+    
+    if ext_choice == "1":
+        extension = ".enc"
+    elif ext_choice == "2":
+        extension = ".bin"
+    else:
+        print("❌ ตัวเลือกไม่ถูกต้อง ใช้ .bin เป็นค่าเริ่มต้น")
+        extension = ".bin"
+    
+    output_file = input_file + extension
     with open(input_file, "rb") as f:
         file_data = f.read()
     encrypted_data = encrypt_data(file_data)
@@ -45,13 +60,22 @@ def encrypt_mode():
         f.write(encrypted_data)
     print(f"✅ ไฟล์ถูกเข้ารหัสแล้ว: {output_file}")
 
-# 🔓 ฟังก์ชันถอดรหัสไฟล์ (ปรับให้รองรับ .bin)
+# 🔓 ฟังก์ชันถอดรหัสไฟล์ (รองรับทั้ง .enc และ .bin)
 def decrypt_mode():
     input_file = input("🔹 กรุณาใส่ชื่อไฟล์ที่ต้องการถอดรหัส: ").strip()
     if not os.path.exists(input_file):
         print("❌ ไม่พบไฟล์ที่ต้องการถอดรหัส")
         return
-    output_file = input_file.replace(".bin", "")  # ลบ .bin ออกเมื่อถอดรหัส
+    
+    # ตรวจสอบและลบ .enc หรือ .bin ออก
+    if input_file.endswith(".enc"):
+        output_file = input_file.replace(".enc", "")
+    elif input_file.endswith(".bin"):
+        output_file = input_file.replace(".bin", "")
+    else:
+        print("❌ ไฟล์ต้องมีนามสกุล .enc หรือ .bin")
+        return
+    
     with open(input_file, "rb") as f:
         encrypted_data = f.read()
     decrypted_data = decrypt_data(encrypted_data)
